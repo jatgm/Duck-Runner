@@ -1,4 +1,5 @@
 import sys
+import json
 import random
 import pygame
 
@@ -38,12 +39,21 @@ iconCredits = pygame.image.load("icons/icons1.png").convert_alpha()
 iconStart = pygame.image.load("icons/icons2.png").convert_alpha()
 iconShop = pygame.image.load("icons/icons3.png").convert_alpha()
 
+
+class charachterHandler(object):
+    def __init__(self):
+        self.currentCharactherID = 1
+
+    def loadCharachter(self):
+        return
+
+
 class player(object):
     def __init__(self):
         self.player = pygame.Rect(50,570,64,128)
         self.jump = False
         self.jumpCooldown = False
-    
+
     def renderPlayer(self):
         pygame.draw.rect(screen, red, self.player)
         if self.jump:
@@ -87,7 +97,7 @@ class enviroment(object):
 
         screen.blit(ground, (self.groundhitbox1.x, self.groundhitbox1.y))
         screen.blit(ground, (self.groundhitbox2.x, self.groundhitbox2.y))
-        
+
         screen.blit(clouds, (self.cloudshitbox1.x, self.cloudshitbox1.y))
         screen.blit(clouds, (self.cloudshitbox2.x, self.cloudshitbox2.y))
 
@@ -116,7 +126,7 @@ class enviroment(object):
         screen.blit(enemy_1, (self.enemyhitbox1.x, self.enemyhitbox1.y))
         screen.blit(enemy_2, (self.enemyhitbox2.x, self.enemyhitbox2.y))
         screen.blit(enemy_3, (self.enemyhitbox3.x, self.enemyhitbox3.y))
-        
+
         if self.enemyhitbox1.right < 0:
             self.enemyhitbox1.x = random.uniform(3000, 1200)
         if self.enemyhitbox2.right < 0:
@@ -128,7 +138,7 @@ class enviroment(object):
             self.enemyhitbox1.x -= self.speed
             self.enemyhitbox2.x -= self.speed
             self.enemyhitbox3.x -= self.speed
-    
+
     def relocateEnemies(self):
         self.enemyhitbox1.x = 1000
         self.enemyhitbox2.x = 2000
