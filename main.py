@@ -150,7 +150,8 @@ class counter(object):
 
     def respawn(self):
         self.respawnCount += 1
-        if self.respawnCount >= 20:
+        print(self.respawnCount)
+        if self.respawnCount >= 10:
             self.respawnCount = 0
             return True
         
@@ -158,6 +159,7 @@ class menu(object):
     def __init__(self):
         self.isMainMenu = True
         self.click = False
+        self.upArrow = False
 
 def menuHandeler():
     if menu.isMainMenu:
@@ -178,6 +180,7 @@ def menuHandeler():
             screen.blit(iconHover, (iconHitbox1.x + 10, iconHitbox1.y + 10))
             if menu.click:
                 menu.click = False
+
         if iconHitbox2.collidepoint((mx, my)):
             screen.blit(iconHover, (iconHitbox2.x + 10, iconHitbox2.y + 10))
             if menu.click:
@@ -185,11 +188,18 @@ def menuHandeler():
                     menu.isMainMenu = False
                     enviroment.relocateEnemies()
                     menu.click = False
+
         if iconHitbox3.collidepoint((mx, my)):
             screen.blit(iconHover, (iconHitbox3.x + 10, iconHitbox3.y + 10))
             if menu.click:
                 print("Clicked Shop")
                 menu.click = False
+
+        if menu.upArrow:
+            if counter.respawn():
+                menu.isMainMenu = False
+                enviroment.relocateEnemies()
+                menu.upArrow = False
 
         screen.blit(iconStart, (393 + 64, 355))
         screen.blit(iconCredits, (393 + 64 - 128, 355))
@@ -218,9 +228,7 @@ while True:
                 if not player.jumpCooldown:
                     player.jump = True
                 if menu.isMainMenu:
-                    if counter.respawn():
-                        menu.isMainMenu = False
-                        enviroment.relocateEnemies()
+                    menu.upArrow = True
             if event.key == pygame.K_ESCAPE:
                 pygame.quit()
                 sys.exit()
