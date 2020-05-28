@@ -1,18 +1,23 @@
 import sys
-import json
 import random
 import pygame
 
+#  -- Setup -- #
 pygame.init()
 clock = pygame.time.Clock()
 
+# -- General Variables -- #
 screen_height = 786
 screen_width = 1024
 middle_canvas_x = screen_width / 2
 middle_canvas_y = screen_height / 2
 
+
+# -- Colors -- #
 white = (91, 91, 91)
 red = (225, 0, 0)
+light_grey = (200, 200, 200)
+darker_light_grey = (150, 150, 150)
 
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption('Duck Runner')
@@ -32,6 +37,17 @@ enemy_2 = pygame.image.load("sprites/enemy_2.png").convert_alpha()
 enemy_3 = pygame.image.load("sprites/enemy_3.png").convert_alpha()
 clouds = pygame.image.load("sprites/clouds.png").convert_alpha()
 
+# --Sounds--#
+jump = pygame.mixer.Sound("audio/jump.wav")
+death = pygame.mixer.Sound("audio/death.wav")
+
+eDeath1 = pygame.mixer.Sound("audio/Enrica/enrica_death_1.wav")
+eDeath2 = pygame.mixer.Sound("audio/Enrica/enrica_death_2.wav")
+eDeath3 = pygame.mixer.Sound("audio/Enrica/enrica_death_3.wav")
+eDeath4 = pygame.mixer.Sound("audio/Enrica/enrica_death_4.wav")
+eYeehaw = pygame.mixer.Sound("audio/Enrica/enrica_yeehaw.wav")
+
+
 # Icons #
 
 iconHover = pygame.image.load("icons/icons0.png").convert_alpha()
@@ -39,14 +55,34 @@ iconCredits = pygame.image.load("icons/icons1.png").convert_alpha()
 iconStart = pygame.image.load("icons/icons2.png").convert_alpha()
 iconShop = pygame.image.load("icons/icons3.png").convert_alpha()
 
-
-class charachterHandler(object):
+class load(object):
     def __init__(self):
-        self.currentCharactherID = 1
+        with open('savefile.txt', 'r+') as f:
+            self.highScore = int(f.readline())
+            self.purchased = int(f.readline())
 
-    def loadCharachter(self):
-        return
+    def newHighScore(self, x):
+        with open('savefile.txt', 'w') as f:
+            self.highScore = x
+            f.write(f'{self.highScore}\n{self.purchased}')
 
+    def newPurchased(self, x):
+        with open('savefile.txt', 'w') as f:
+            self.purchased = x
+            f.write(f'{self.highScore}\n{self.purchased}')
+
+class audio(object):
+    def __init__(self):
+        self.aJump = False
+        self.aDie = False
+    
+    def audioDriver(self):
+        if self.aJump:
+            jump.play()
+            self.aJump = False
+        if self.aDie:
+            death.play()
+            self.aDie = False
 
 class player(object):
     def __init__(self):
@@ -55,7 +91,7 @@ class player(object):
         self.jumpCooldown = False
 
     def renderPlayer(self):
-        pygame.draw.rect(screen, red, self.player)
+        pygame.draw.rect(screen, white, self.player)
         if self.jump:
             if not menu.isMainMenu:
                 self.player.y -= 20
@@ -71,10 +107,20 @@ class player(object):
     def enemyCollosion(self):
         if self.player.colliderect(enviroment.enemyhitbox1):
             menu.isMainMenu = True
+            audio.aDie = True
         if self.player.colliderect(enviroment.enemyhitbox2):
             menu.isMainMenu = True
+            audio.aDie = True
         if self.player.colliderect(enviroment.enemyhitbox3):
             menu.isMainMenu = True
+            audio.aDie = True
+
+    def skinController(self):
+        if menu.isMainMenu:
+            screen.blit(idleSprite, (self.player.x, self.player.y))
+        else:
+            screen.blit(runSprites[counter.screenCount], (self.player.x, self.player.y))
+
 
 class enviroment(object):
     def __init__(self, speed=15):
@@ -147,12 +193,33 @@ class enviroment(object):
 class counter(object):
     def __init__(self):
         self.counter = 0
+        self.highScoreCounter = 0
+        self.score = 0
         self.respawnCount = 0
         self.screenCount = 0
 
+    def countHighScore(self):
+        if not menu.isMainMenu:
+            self.highScoreCounter += 1
+            if self.highScoreCounter >= 30:
+                self.score += 5
+                self.highScoreCounter = 0
+            if self.score >= load.highScore:
+                load.newHighScore(self.score)
+            scoreText = menu.gameFont.render(f"{self.score}".zfill(5), True, light_grey)
+            screen.blit(scoreText, (middle_canvas_x + 350, middle_canvas_y - 380))
+            highscoreText = menu.gameFont.render(f"{load.highScore}".zfill(5), True, darker_light_grey)
+            screen.blit(highscoreText, (middle_canvas_x + 200, middle_canvas_y - 380))
+        if menu.isMainMenu:
+            self.score = 0
+
     def count(self):
+        if menu.isMainMenu:
+            x = 30
+        else:
+            x = 10
         self.counter += 1
-        if self.counter >= 30:
+        if self.counter >= x:
             self.counter = 0
             self.screenCount += 1
         if self.screenCount >= 2:
@@ -160,7 +227,6 @@ class counter(object):
 
     def respawn(self):
         self.respawnCount += 1
-        print(self.respawnCount)
         if self.respawnCount >= 10:
             self.respawnCount = 0
             return True
@@ -170,6 +236,7 @@ class menu(object):
         self.isMainMenu = True
         self.click = False
         self.upArrow = False
+        self.gameFont = pygame.font.Font("fonts/Unibody8Pro-Regular.otf", 32)
 
 def menuHandeler():
     if menu.isMainMenu:
@@ -217,17 +284,22 @@ def menuHandeler():
 
 def renderGraphics():
     screen.fill(white)
-    enviroment.renderEnviroment()
-    enviroment.renderEnemies()
     player.renderPlayer()
+    enviroment.renderEnviroment()
+    audio.audioDriver()
+    enviroment.renderEnemies()
+    player.skinController()
     player.enemyCollosion()
     counter.count()
+    counter.countHighScore()
 
 # Game Loop #
 player = player()
 enviroment = enviroment()
 counter = counter()
+audio = audio()
 menu = menu()
+load = load()
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -237,6 +309,7 @@ while True:
             if event.key == pygame.K_UP:
                 if not player.jumpCooldown:
                     player.jump = True
+                    audio.aJump = True
                 if menu.isMainMenu:
                     menu.upArrow = True
             if event.key == pygame.K_ESCAPE:
