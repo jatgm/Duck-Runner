@@ -118,7 +118,9 @@ class player(object):
     def skinController(self):
         if menu.isMainMenu:
             screen.blit(idleSprite, (self.player.x, self.player.y))
-        else:
+        if self.jump:
+            screen.blit(idleSprite, (self.player.x, self.player.y))
+        if not menu.isMainMenu:
             screen.blit(runSprites[counter.screenCount], (self.player.x, self.player.y))
 
 
