@@ -82,8 +82,7 @@ class audio(object):
             self.aJump = False
         if self.aDie:
             death.play()
-            self.aDie = False
-
+        
 class player(object):
     def __init__(self):
         self.player = pygame.Rect(50,570,64,128)
@@ -105,6 +104,7 @@ class player(object):
                     self.jumpCooldown = False
 
     def enemyCollosion(self):
+        print(audio.aDie)
         if self.player.colliderect(enviroment.enemyhitbox1):
             menu.isMainMenu = True
             audio.aDie = True
@@ -112,7 +112,6 @@ class player(object):
             menu.isMainMenu = True
             audio.aDie = True
         if self.player.colliderect(enviroment.enemyhitbox3):
-            menu.isMainMenu = True
             audio.aDie = True
 
     def skinController(self):
@@ -122,7 +121,6 @@ class player(object):
             screen.blit(idleSprite, (self.player.x, self.player.y))
         if not menu.isMainMenu:
             screen.blit(runSprites[counter.screenCount], (self.player.x, self.player.y))
-
 
 class enviroment(object):
     def __init__(self, speed=15):
