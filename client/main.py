@@ -12,7 +12,6 @@ screen_width = 1024
 middle_canvas_x = screen_width / 2
 middle_canvas_y = screen_height / 2
 
-
 # -- Colors -- #
 white = (91, 91, 91)
 red = (225, 0, 0)
