@@ -1,5 +1,5 @@
 import sys
-import random
+from random import randrange, uniform
 import pygame
 
 #  -- Setup -- #
@@ -41,10 +41,13 @@ clouds = pygame.image.load("sprites/clouds.png").convert_alpha()
 jump = pygame.mixer.Sound("audio/jump.wav")
 death = pygame.mixer.Sound("audio/death.wav")
 
-eDeath1 = pygame.mixer.Sound("audio/Enrica/enrica_death_1.wav")
-eDeath2 = pygame.mixer.Sound("audio/Enrica/enrica_death_2.wav")
-eDeath3 = pygame.mixer.Sound("audio/Enrica/enrica_death_3.wav")
-eDeath4 = pygame.mixer.Sound("audio/Enrica/enrica_death_4.wav")
+eDeath = [
+    pygame.mixer.Sound("audio/Enrica/enrica_death_1.wav"), 
+    pygame.mixer.Sound("audio/Enrica/enrica_death_2.wav"), 
+    pygame.mixer.Sound("audio/Enrica/enrica_death_3.wav"), 
+    pygame.mixer.Sound("audio/Enrica/enrica_death_4.wav")
+]
+
 eYeehaw = pygame.mixer.Sound("audio/Enrica/enrica_yeehaw.wav")
 
 
@@ -75,13 +78,16 @@ class audio(object):
     def __init__(self):
         self.aJump = False
         self.aDie = False
+        self.barrier = 0
     
     def audioDriver(self):
         if self.aJump:
             jump.play()
             self.aJump = False
         if self.aDie:
-            death.play()
+            self.barrier += 1
+            if self.barrier == 1:
+                eDeath[randrange(4)].play()
         
 class player(object):
     def __init__(self):
@@ -104,15 +110,17 @@ class player(object):
                     self.jumpCooldown = False
 
     def enemyCollosion(self):
-        print(audio.aDie)
         if self.player.colliderect(enviroment.enemyhitbox1):
             menu.isMainMenu = True
             audio.aDie = True
-        if self.player.colliderect(enviroment.enemyhitbox2):
+        elif self.player.colliderect(enviroment.enemyhitbox2):
             menu.isMainMenu = True
             audio.aDie = True
-        if self.player.colliderect(enviroment.enemyhitbox3):
+        elif self.player.colliderect(enviroment.enemyhitbox3):
+            menu.isMainMenu = True
             audio.aDie = True
+        else:
+            audio.aDie = False
 
     def skinController(self):
         if menu.isMainMenu:
@@ -123,8 +131,8 @@ class player(object):
             screen.blit(runSprites[counter.screenCount], (self.player.x, self.player.y))
 
 class enviroment(object):
-    def __init__(self, speed=15):
-        self.speed = speed
+    def __init__(self):
+        self.speed = 15
         self.cloudSpeed = 3
         self.groundhitbox1 = pygame.Rect(0, 666, 1200, 64)
         self.groundhitbox2 = pygame.Rect(1200, 666, 1200, 64)
@@ -174,21 +182,29 @@ class enviroment(object):
         screen.blit(enemy_3, (self.enemyhitbox3.x, self.enemyhitbox3.y))
 
         if self.enemyhitbox1.right < 0:
-            self.enemyhitbox1.x = random.uniform(3000, 1200)
+            self.enemyhitbox1.x = uniform(3000, 4500)
         if self.enemyhitbox2.right < 0:
-            self.enemyhitbox2.x = random.uniform(4500, 5000)
+            self.enemyhitbox2.x = uniform(4500, 8000)
         if self.enemyhitbox3.right < 0:
-            self.enemyhitbox3.x = random.uniform(9500, 10000)
+            self.enemyhitbox3.x = uniform(9000, 10000)
 
         if not menu.isMainMenu:
             self.enemyhitbox1.x -= self.speed
             self.enemyhitbox2.x -= self.speed
             self.enemyhitbox3.x -= self.speed
 
+    def speedIncreaser(self):
+        if counter.score > 500:
+            self.speed += 0.001
+        if counter.score == 0:
+            self.speed = 15
+
     def relocateEnemies(self):
         self.enemyhitbox1.x = 1000
         self.enemyhitbox2.x = 2000
         self.enemyhitbox3.x = 3000
+        audio.barrier = 0
+        audio.aDie = False
 
 class counter(object):
     def __init__(self):
@@ -227,7 +243,7 @@ class counter(object):
 
     def respawn(self):
         self.respawnCount += 1
-        if self.respawnCount >= 10:
+        if self.respawnCount >= 30:
             self.respawnCount = 0
             return True
         
@@ -286,6 +302,7 @@ def renderGraphics():
     screen.fill(white)
     player.renderPlayer()
     enviroment.renderEnviroment()
+    enviroment.speedIncreaser()
     audio.audioDriver()
     enviroment.renderEnemies()
     player.skinController()
