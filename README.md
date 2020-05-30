@@ -1,7 +1,7 @@
 [![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://github.com/abyss-developers/AbyssRPG/blob/master/LICENSE.md)
 [![Discord](https://img.shields.io/discord/463752820026376202.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/NbuvagJ)
 
-# Duck-Runner
+# Duck Runner
 > Duck Runner is a simple, high CPU intensive 2D runner game where the whole premise is about a duck. It boasts verbose features such as a Skin Shop, voice acted scripting (see Credits section) and animations.
 
 ## How do I play?
