@@ -9,6 +9,7 @@ Pygame Install
 - Prerequisites: Python 3.5+, Pygame
 - Install the project and unzip the files. There should be a **client** folder.
 - Navigate into the "client" folder and click on **main.py**
+
 .exe Install
 - Coming soon
 
