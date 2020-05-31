@@ -193,8 +193,7 @@ class enviroment(object):
             self.enemyhitbox3.x -= self.speed
 
     def speedIncreaser(self):
-        if counter.score > 500:
-            self.speed += 0.001
+        self.speed += 0.001
         if counter.score == 0:
             self.speed = 15
 
@@ -216,7 +215,7 @@ class counter(object):
     def countHighScore(self):
         if not menu.isMainMenu:
             self.highScoreCounter += 1
-            if self.highScoreCounter >= 30:
+            if self.highScoreCounter >= 15:
                 self.score += 5
                 self.highScoreCounter = 0
             if self.score >= load.highScore:
@@ -252,6 +251,7 @@ class menu(object):
         self.click = False
         self.upArrow = False
         self.gameFont = pygame.font.Font("fonts/Unibody8Pro-Regular.otf", 32)
+        self.gameFont2 = pygame.font.Font("fonts/Unibody8Pro-Regular.otf", 16)
 
 def menuHandeler():
     if menu.isMainMenu:
@@ -269,12 +269,12 @@ def menuHandeler():
         pygame.draw.rect(screen, white, iconHitbox3)
 
         if iconHitbox1.collidepoint((mx, my)):
-            screen.blit(iconHover, (iconHitbox1.x + 10, iconHitbox1.y + 10))
+            screen.blit(iconHover, (iconHitbox1.x + 8, iconHitbox1.y + 8))
             if menu.click:
                 menu.click = False
 
         if iconHitbox2.collidepoint((mx, my)):
-            screen.blit(iconHover, (iconHitbox2.x + 10, iconHitbox2.y + 10))
+            screen.blit(iconHover, (iconHitbox2.x + 8, iconHitbox2.y + 8))
             if menu.click:
                 if counter.respawn():
                     menu.isMainMenu = False
@@ -282,7 +282,7 @@ def menuHandeler():
                     menu.click = False
 
         if iconHitbox3.collidepoint((mx, my)):
-            screen.blit(iconHover, (iconHitbox3.x + 10, iconHitbox3.y + 10))
+            screen.blit(iconHover, (iconHitbox3.x + 8, iconHitbox3.y + 8))
             if menu.click:
                 print("Clicked Shop")
                 menu.click = False
@@ -293,9 +293,24 @@ def menuHandeler():
                 enviroment.relocateEnemies()
                 menu.upArrow = False
 
+        versionText = menu.gameFont2.render("pre-release 0.0.0", True, darker_light_grey)
+        screen.blit(versionText, (middle_canvas_x + 310, middle_canvas_y + 370))
+
         screen.blit(iconStart, (393 + 64, 355))
         screen.blit(iconCredits, (393 + 64 - 128, 355))
         screen.blit(iconShop, (393 + 64 + 128, 355))
+
+def splashScreen():
+    fade = pygame.Surface((screen_width, screen_height))
+    fade.fill((0, 0, 0))
+    opacity = 255
+
+    for i in range(0, 255):
+        opacity -= 1
+        fade.set_alpha(opacity)
+        renderGraphics()
+        screen.blit(fade, (0, 0))
+        pygame.display.flip()
 
 def renderGraphics():
     screen.fill(white)
@@ -316,6 +331,11 @@ counter = counter()
 audio = audio()
 menu = menu()
 load = load()
+
+# Splash Screen #
+
+splashScreen()
+
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
