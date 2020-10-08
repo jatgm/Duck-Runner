@@ -127,7 +127,8 @@ class player(object):
         if self.jump:
             screen.blit(idleSprite, (self.player.x, self.player.y))
         if not menu.isMainMenu:
-            screen.blit(runSprites[counter.screenCount], (self.player.x, self.player.y))
+            if not self.jump:
+                screen.blit(runSprites[counter.screenCount], (self.player.x, self.player.y))
 
 class enviroment(object):
     def __init__(self):
@@ -306,7 +307,7 @@ def splashScreen():
     opacity = 255
 
     for i in range(0, 255):
-        opacity -= 1
+        opacity -= 20
         fade.set_alpha(opacity)
         renderGraphics()
         screen.blit(fade, (0, 0))
