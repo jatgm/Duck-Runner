@@ -72,27 +72,14 @@ class load(object):
         with open('savefile.txt', 'w') as f:
             self.purchased = x
             f.write(f'{self.highScore}\n{self.purchased}')
-
-class audio(object):
-    def __init__(self):
-        self.aJump = False
-        self.aDie = False
-        self.barrier = 0
-    
-    def audioDriver(self):
-        if self.aJump:
-            jump.play()
-            self.aJump = False
-        if self.aDie:
-            self.barrier += 1
-            if self.barrier == 1:
-                JaxDeath[randrange(4)].play()
         
 class player(object):
     def __init__(self):
         self.player = pygame.Rect(50,570,64,128)
         self.jump = False
         self.jumpCooldown = False
+        self.dead = False
+        self.barrier = 0
 
     def renderPlayer(self):
         pygame.draw.rect(screen, white, self.player)
@@ -100,6 +87,7 @@ class player(object):
             if not menu.isMainMenu:
                 self.player.y -= 20
         if self.player.y < 300:
+            player.barrier = 0
             self.jump = False
             self.jumpCooldown = True
         if self.jumpCooldown:
@@ -111,15 +99,15 @@ class player(object):
     def enemyCollosion(self):
         if self.player.colliderect(enviroment.enemyhitbox1):
             menu.isMainMenu = True
-            audio.aDie = True
+            player.dead = True
         elif self.player.colliderect(enviroment.enemyhitbox2):
             menu.isMainMenu = True
-            audio.aDie = True
+            player.dead = True
         elif self.player.colliderect(enviroment.enemyhitbox3):
             menu.isMainMenu = True
-            audio.aDie = True
+            player.dead = True
         else:
-            audio.aDie = False
+            player.dead = False
 
     def skinController(self):
         if menu.isMainMenu:
@@ -129,6 +117,16 @@ class player(object):
         if not menu.isMainMenu:
             if not self.jump:
                 screen.blit(runSprites[counter.screenCount], (self.player.x, self.player.y))
+
+    def audioDriver(self):
+        if self.jump:
+            self.barrier += 1
+            if self.barrier == 1:
+                jump.play()
+        if self.dead:
+            self.barrier += 1
+            if self.barrier == 1:
+                JaxDeath[randrange(4)].play()
 
 class enviroment(object):
     def __init__(self):
@@ -202,8 +200,8 @@ class enviroment(object):
         self.enemyhitbox1.x = 1000
         self.enemyhitbox2.x = 2000
         self.enemyhitbox3.x = 3000
-        audio.barrier = 0
-        audio.aDie = False
+        player.barrier = 0
+        player.dead = False
 
 class counter(object):
     def __init__(self):
@@ -318,7 +316,7 @@ def renderGraphics():
     player.renderPlayer()
     enviroment.renderEnviroment()
     enviroment.speedIncreaser()
-    audio.audioDriver()
+    player.audioDriver()
     enviroment.renderEnemies()
     player.skinController()
     player.enemyCollosion()
@@ -329,7 +327,6 @@ def renderGraphics():
 player = player()
 enviroment = enviroment()
 counter = counter()
-audio = audio()
 menu = menu()
 load = load()
 
@@ -344,9 +341,9 @@ while True:
             sys.exit()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
-                if not player.jumpCooldown:
-                    player.jump = True
-                    audio.aJump = True
+                if not menu.isMainMenu:
+                    if not player.jumpCooldown:
+                        player.jump = True
                 if menu.isMainMenu:
                     menu.upArrow = True
             if event.key == pygame.K_ESCAPE:
