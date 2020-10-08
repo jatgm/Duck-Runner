@@ -194,7 +194,7 @@ class enviroment(object):
             self.enemyhitbox3.x -= self.speed
 
     def speedIncreaser(self):
-        self.speed += 0.001
+        self.speed += 0.005
         if counter.score == 0:
             self.speed = 15
 
@@ -294,8 +294,8 @@ def menuHandeler():
                 enviroment.relocateEnemies()
                 menu.upArrow = False
 
-        versionText = menu.gameFont2.render("pre-release 0.0.0", True, darker_light_grey)
-        screen.blit(versionText, (middle_canvas_x + 310, middle_canvas_y + 370))
+        versionText = menu.gameFont2.render("Beta 0.0", True, darker_light_grey)
+        screen.blit(versionText, (middle_canvas_x + 415, middle_canvas_y + 370))
 
         screen.blit(iconStart, (393 + 64, 355))
         screen.blit(iconCredits, (393 + 64 - 128, 355))
