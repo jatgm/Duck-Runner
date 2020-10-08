@@ -40,14 +40,14 @@ clouds = pygame.image.load("sprites/clouds.png").convert_alpha()
 jump = pygame.mixer.Sound("audio/jump.wav")
 death = pygame.mixer.Sound("audio/death.wav")
 
-eDeath = [
-    pygame.mixer.Sound("audio/Enrica/enrica_death_1.wav"), 
-    pygame.mixer.Sound("audio/Enrica/enrica_death_2.wav"), 
-    pygame.mixer.Sound("audio/Enrica/enrica_death_3.wav"), 
-    pygame.mixer.Sound("audio/Enrica/enrica_death_4.wav")
+JaxDeath = [
+    pygame.mixer.Sound("audio/Jax/jax_death_1.wav"), 
+    pygame.mixer.Sound("audio/Jax/jax_death_2.wav"), 
+    pygame.mixer.Sound("audio/Jax/jax_death_3.wav"), 
+    pygame.mixer.Sound("audio/Jax/jax_death_4.wav")
 ]
 
-eYeehaw = pygame.mixer.Sound("audio/Enrica/enrica_yeehaw.wav")
+eYeehaw = pygame.mixer.Sound("audio/Jax/jax_yeehaw.wav")
 
 
 # Icons #
@@ -86,7 +86,7 @@ class audio(object):
         if self.aDie:
             self.barrier += 1
             if self.barrier == 1:
-                eDeath[randrange(4)].play()
+                JaxDeath[randrange(4)].play()
         
 class player(object):
     def __init__(self):
