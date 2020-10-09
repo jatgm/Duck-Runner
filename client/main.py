@@ -100,12 +100,15 @@ class player(object):
         if self.player.colliderect(enviroment.enemyhitbox1):
             menu.isMainMenu = True
             player.dead = True
+            counter.respawn()
         elif self.player.colliderect(enviroment.enemyhitbox2):
             menu.isMainMenu = True
             player.dead = True
+            counter.respawn()
         elif self.player.colliderect(enviroment.enemyhitbox3):
             menu.isMainMenu = True
             player.dead = True
+            counter.respawn()
         else:
             player.dead = False
 
@@ -192,7 +195,7 @@ class enviroment(object):
             self.enemyhitbox3.x -= self.speed
 
     def speedIncreaser(self):
-        self.speed += 0.005
+        self.speed += 0.001
         if counter.score == 0:
             self.speed = 15
 
@@ -207,6 +210,7 @@ class counter(object):
     def __init__(self):
         self.counter = 0
         self.highScoreCounter = 0
+        self.respawnCooldown = True
         self.score = 0
         self.respawnCount = 0
         self.screenCount = 0
@@ -242,7 +246,7 @@ class counter(object):
         self.respawnCount += 1
         if self.respawnCount >= 30:
             self.respawnCount = 0
-            return True
+            self.respawnCooldown = False #LEFT OFF HERE
         
 class menu(object):
     def __init__(self):
@@ -275,7 +279,7 @@ def menuHandeler():
         if iconHitbox2.collidepoint((mx, my)):
             screen.blit(iconHover, (iconHitbox2.x + 8, iconHitbox2.y + 8))
             if menu.click:
-                if counter.respawn():
+                if not counter.respawnCooldown or menu.isMainMenu:
                     menu.isMainMenu = False
                     enviroment.relocateEnemies()
                     menu.click = False
@@ -287,7 +291,7 @@ def menuHandeler():
                 menu.click = False
 
         if menu.upArrow:
-            if counter.respawn():
+            if not counter.respawnCooldown or menu.isMainMenu:
                 menu.isMainMenu = False
                 enviroment.relocateEnemies()
                 menu.upArrow = False
