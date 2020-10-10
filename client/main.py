@@ -256,52 +256,52 @@ class menu(object):
         self.gameFont = pygame.font.Font("fonts/Unibody8Pro-Regular.otf", 32)
         self.gameFont2 = pygame.font.Font("fonts/Unibody8Pro-Regular.otf", 16)
 
-def menuHandeler():
-    if menu.isMainMenu:
-        screen.blit(titlescreen, (middle_canvas_x, middle_canvas_y - 300))
-        screen.blit(startanimation[counter.screenCount], (middle_canvas_x - 290, middle_canvas_y - 300))
-        
-        mx, my = pygame.mouse.get_pos()
+    def menuHandeler(self):
+        if menu.isMainMenu:
+            screen.blit(titlescreen, (middle_canvas_x, middle_canvas_y - 300))
+            screen.blit(startanimation[counter.screenCount], (middle_canvas_x - 290, middle_canvas_y - 300))
+            
+            mx, my = pygame.mouse.get_pos()
 
-        iconHitbox2 = pygame.Rect(393 + 64, 355, 128, 128)
-        iconHitbox1 = pygame.Rect(393 + 64 - 128, 355, 128, 128)
-        iconHitbox3 = pygame.Rect(393 + 64 + 128, 355, 128, 128)
+            iconHitbox2 = pygame.Rect(393 + 64, 355, 128, 128)
+            iconHitbox1 = pygame.Rect(393 + 64 - 128, 355, 128, 128)
+            iconHitbox3 = pygame.Rect(393 + 64 + 128, 355, 128, 128)
 
-        pygame.draw.rect(screen, white, iconHitbox1)
-        pygame.draw.rect(screen, white, iconHitbox2)
-        pygame.draw.rect(screen, white, iconHitbox3)
+            pygame.draw.rect(screen, white, iconHitbox1)
+            pygame.draw.rect(screen, white, iconHitbox2)
+            pygame.draw.rect(screen, white, iconHitbox3)
 
-        if iconHitbox1.collidepoint((mx, my)):
-            screen.blit(iconHover, (iconHitbox1.x + 8, iconHitbox1.y + 8))
-            if menu.click:
-                menu.click = False
+            if iconHitbox1.collidepoint((mx, my)):
+                screen.blit(iconHover, (iconHitbox1.x + 8, iconHitbox1.y + 8))
+                if menu.click:
+                    menu.click = False
 
-        if iconHitbox2.collidepoint((mx, my)):
-            screen.blit(iconHover, (iconHitbox2.x + 8, iconHitbox2.y + 8))
-            if menu.click:
+            if iconHitbox2.collidepoint((mx, my)):
+                screen.blit(iconHover, (iconHitbox2.x + 8, iconHitbox2.y + 8))
+                if menu.click:
+                    if not counter.respawnCooldown or menu.isMainMenu:
+                        menu.isMainMenu = False
+                        enviroment.relocateEnemies()
+                        menu.click = False
+
+            if iconHitbox3.collidepoint((mx, my)):
+                screen.blit(iconHover, (iconHitbox3.x + 8, iconHitbox3.y + 8))
+                if menu.click:
+                    print("Clicked Shop")
+                    menu.click = False
+
+            if menu.upArrow:
                 if not counter.respawnCooldown or menu.isMainMenu:
                     menu.isMainMenu = False
                     enviroment.relocateEnemies()
-                    menu.click = False
+                    menu.upArrow = False
 
-        if iconHitbox3.collidepoint((mx, my)):
-            screen.blit(iconHover, (iconHitbox3.x + 8, iconHitbox3.y + 8))
-            if menu.click:
-                print("Clicked Shop")
-                menu.click = False
+            versionText = menu.gameFont2.render("Beta 0.0", True, darker_light_grey)
+            screen.blit(versionText, (middle_canvas_x + 415, middle_canvas_y + 370))
 
-        if menu.upArrow:
-            if not counter.respawnCooldown or menu.isMainMenu:
-                menu.isMainMenu = False
-                enviroment.relocateEnemies()
-                menu.upArrow = False
-
-        versionText = menu.gameFont2.render("Beta 0.0", True, darker_light_grey)
-        screen.blit(versionText, (middle_canvas_x + 415, middle_canvas_y + 370))
-
-        screen.blit(iconStart, (393 + 64, 355))
-        screen.blit(iconCredits, (393 + 64 - 128, 355))
-        screen.blit(iconShop, (393 + 64 + 128, 355))
+            screen.blit(iconStart, (393 + 64, 355))
+            screen.blit(iconCredits, (393 + 64 - 128, 355))
+            screen.blit(iconShop, (393 + 64 + 128, 355))
 
 def splashScreen():
     fade = pygame.Surface((screen_width, screen_height))
@@ -327,37 +327,38 @@ def renderGraphics():
     counter.count()
     counter.countHighScore()
 
-# Game Loop #
+# Classes #
 player = player()
 enviroment = enviroment()
 counter = counter()
 menu = menu()
 load = load()
 
-# Splash Screen #
-
-splashScreen()
-
-while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP:
-                if not menu.isMainMenu:
-                    if not player.jumpCooldown:
-                        player.jump = True
-                if menu.isMainMenu:
-                    menu.upArrow = True
-            if event.key == pygame.K_ESCAPE:
+def actone():
+    splashScreen()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            menu.click = True
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_UP:
+                    if not menu.isMainMenu:
+                        if not player.jumpCooldown:
+                            player.jump = True
+                    if menu.isMainMenu:
+                        menu.upArrow = True
+                if event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                menu.click = True
 
-    renderGraphics()
-    menuHandeler()
+        renderGraphics()
+        menu.menuHandeler()
 
-    clock.tick(60)
-    pygame.display.flip()
+        clock.tick(60)
+        pygame.display.flip()
+
+actone()
+    
