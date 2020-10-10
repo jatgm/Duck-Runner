@@ -84,40 +84,40 @@ class player(object):
     def renderPlayer(self):
         pygame.draw.rect(screen, white, self.player)
         if self.jump:
-            if not menu.isMainMenu:
+            if not menu.startMenu:
                 self.player.y -= 20
         if self.player.y < 300:
             player.barrier = 0
             self.jump = False
             self.jumpCooldown = True
         if self.jumpCooldown:
-            if not menu.isMainMenu:
+            if not menu.startMenu:
                 self.player.y += 10
                 if self.player.y > 569:
                     self.jumpCooldown = False
 
     def enemyCollosion(self):
         if self.player.colliderect(enviroment.enemyhitbox1):
-            menu.isMainMenu = True
+            menu.startMenu = True
             player.dead = True
             counter.respawn()
         elif self.player.colliderect(enviroment.enemyhitbox2):
-            menu.isMainMenu = True
+            menu.startMenu = True
             player.dead = True
             counter.respawn()
         elif self.player.colliderect(enviroment.enemyhitbox3):
-            menu.isMainMenu = True
+            menu.startMenu = True
             player.dead = True
             counter.respawn()
         else:
             player.dead = False
 
     def skinController(self):
-        if menu.isMainMenu:
+        if menu.startMenu:
             screen.blit(idleSprite, (self.player.x, self.player.y))
         if self.jump:
             screen.blit(idleSprite, (self.player.x, self.player.y))
-        if not menu.isMainMenu:
+        if not menu.startMenu:
             if not self.jump:
                 screen.blit(runSprites[counter.screenCount], (self.player.x, self.player.y))
 
@@ -156,7 +156,7 @@ class enviroment(object):
         screen.blit(clouds, (self.cloudshitbox1.x, self.cloudshitbox1.y))
         screen.blit(clouds, (self.cloudshitbox2.x, self.cloudshitbox2.y))
 
-        if not menu.isMainMenu:
+        if not menu.startMenu:
             self.groundhitbox1.x -= self.speed
             self.groundhitbox2.x -= self.speed
 
@@ -189,7 +189,7 @@ class enviroment(object):
         if self.enemyhitbox3.right < 0:
             self.enemyhitbox3.x = uniform(9000, 10000)
 
-        if not menu.isMainMenu:
+        if not menu.startMenu:
             self.enemyhitbox1.x -= self.speed
             self.enemyhitbox2.x -= self.speed
             self.enemyhitbox3.x -= self.speed
@@ -203,6 +203,8 @@ class enviroment(object):
         self.enemyhitbox1.x = 1000
         self.enemyhitbox2.x = 2000
         self.enemyhitbox3.x = 3000
+        counter.respawnCount = 0
+        counter.respawnCooldown = True
         player.barrier = 0
         player.dead = False
 
@@ -216,7 +218,7 @@ class counter(object):
         self.screenCount = 0
 
     def countHighScore(self):
-        if not menu.isMainMenu:
+        if not menu.startMenu:
             self.highScoreCounter += 1
             if self.highScoreCounter >= 15:
                 self.score += 5
@@ -227,11 +229,11 @@ class counter(object):
             screen.blit(scoreText, (middle_canvas_x + 350, middle_canvas_y - 380))
             highscoreText = menu.gameFont.render(f"{load.highScore}".zfill(5), True, darker_light_grey)
             screen.blit(highscoreText, (middle_canvas_x + 200, middle_canvas_y - 380))
-        if menu.isMainMenu:
+        if menu.startMenu:
             self.score = 0
 
     def count(self):
-        if menu.isMainMenu:
+        if menu.startMenu:
             x = 30
         else:
             x = 10
@@ -244,20 +246,19 @@ class counter(object):
 
     def respawn(self):
         self.respawnCount += 1
-        if self.respawnCount >= 30:
-            self.respawnCount = 0
+        if self.respawnCount >= 60:
             self.respawnCooldown = False #LEFT OFF HERE
         
 class menu(object):
     def __init__(self):
-        self.isMainMenu = True
+        self.startMenu = True
         self.click = False
         self.upArrow = False
         self.gameFont = pygame.font.Font("fonts/Unibody8Pro-Regular.otf", 32)
         self.gameFont2 = pygame.font.Font("fonts/Unibody8Pro-Regular.otf", 16)
 
     def menuHandeler(self):
-        if menu.isMainMenu:
+        if menu.startMenu:
             screen.blit(titlescreen, (middle_canvas_x, middle_canvas_y - 300))
             screen.blit(startanimation[counter.screenCount], (middle_canvas_x - 290, middle_canvas_y - 300))
             
@@ -279,10 +280,9 @@ class menu(object):
             if iconHitbox2.collidepoint((mx, my)):
                 screen.blit(iconHover, (iconHitbox2.x + 8, iconHitbox2.y + 8))
                 if menu.click:
-                    if not counter.respawnCooldown or menu.isMainMenu:
-                        menu.isMainMenu = False
-                        enviroment.relocateEnemies()
-                        menu.click = False
+                    menu.startMenu = False
+                    enviroment.relocateEnemies()
+                    menu.click = False
 
             if iconHitbox3.collidepoint((mx, my)):
                 screen.blit(iconHover, (iconHitbox3.x + 8, iconHitbox3.y + 8))
@@ -291,9 +291,11 @@ class menu(object):
                     menu.click = False
 
             if menu.upArrow:
-                if not counter.respawnCooldown or menu.isMainMenu:
-                    menu.isMainMenu = False
+                if not counter.respawnCooldown:
+                    menu.startMenu = False
                     enviroment.relocateEnemies()
+                    menu.upArrow = False
+                else:
                     menu.upArrow = False
 
             versionText = menu.gameFont2.render("Beta 0.0", True, darker_light_grey)
@@ -329,9 +331,9 @@ def renderGraphics():
 
 # Classes #
 player = player()
+menu = menu()
 enviroment = enviroment()
 counter = counter()
-menu = menu()
 load = load()
 
 def actone():
@@ -343,10 +345,10 @@ def actone():
                 sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
-                    if not menu.isMainMenu:
+                    if not menu.startMenu:
                         if not player.jumpCooldown:
                             player.jump = True
-                    if menu.isMainMenu:
+                    if menu.startMenu:
                         menu.upArrow = True
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
@@ -361,4 +363,3 @@ def actone():
         pygame.display.flip()
 
 actone()
-    
