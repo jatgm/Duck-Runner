@@ -11,7 +11,7 @@ Pygame Install
 - Navigate into the "client" folder and click on **main.py**
 
 .exe Install
-- Coming soon
+- Check [releases](https://github.com/abyss-developers/Duck-Runner/releases).
 
 ## LICENSE
 This project is licensed under the [MIT](LICENSE.md) license. Copyright (C) 2020 abyss-developers
