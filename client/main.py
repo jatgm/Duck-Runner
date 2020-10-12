@@ -84,7 +84,8 @@ class player(object):
         self.jump = False
         self.jumpCooldown = False
         self.dead = False
-        self.barrier = 0
+        self.jumpBarrier = 0
+        self.deadBarrier = 0
 
     def renderPlayer(self):
         pygame.draw.rect(screen, white, self.player)
@@ -92,7 +93,7 @@ class player(object):
             if not menu.startMenu:
                 self.player.y -= 20
         if self.player.y < 300:
-            player.barrier = 0
+            player.jumpBarrier = 0
             self.jump = False
             self.jumpCooldown = True
         if self.jumpCooldown:
@@ -130,13 +131,13 @@ class player(object):
 
     def audio(self):
         if self.jump:
-            self.barrier += 1
-            if self.barrier == 1:
+            self.jumpBarrier += 1
+            if self.jumpBarrier == 1:
                 jump.play()
                 print('poop')
         if self.dead:
-            self.barrier += 1
-            if self.barrier == 1:
+            self.deadBarrier += 1
+            if self.deadBarrier == 1:
                 JaxDeath[randrange(4)].play()
                 print('pee')
 
@@ -190,7 +191,7 @@ class enviroment(object):
         enemy3.hitbox.x = uniform(3000, 4000)
         counter.respawnCount = 0
         counter.respawnCooldown = True
-        player.barrier = 0
+        player.deadBarrier = 0
         player.dead = False
 
 class enemy(object):
@@ -207,7 +208,7 @@ class enemy(object):
         if not menu.startMenu:
             self.hitbox.x -= enviroment.speed
 
-class counter(object):
+class counter(object):  
     def __init__(self):
         self.counter = 0
         self.highScoreCounter = 0
@@ -277,7 +278,6 @@ class menu(object):
         elif iconHitbox2.collidepoint((mx, my)):
             screen.blit(iconHover, (iconHitbox2.x + 8, iconHitbox2.y + 8))
             if self.click:
-                print("bruh")
                 self.startMenu = False
                 enviroment.relocateEnemies()
                 self.click = False
