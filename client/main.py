@@ -31,9 +31,13 @@ startanimation = [pygame.image.load("sprites/startanimation0.png").convert_alpha
 ground = pygame.image.load("sprites/ground.png").convert_alpha()
 titlescreen = pygame.image.load("sprites/titlescreen.png").convert_alpha()
 deadduck = pygame.image.load("sprites/deadscene.png").convert_alpha()
-enemy_1 = pygame.image.load("sprites/enemy_1.png").convert_alpha()
-enemy_2 = pygame.image.load("sprites/enemy_2.png").convert_alpha()
-enemy_3 = pygame.image.load("sprites/enemy_3.png").convert_alpha()
+
+enemySprites = [pygame.image.load("sprites/enemy_1.png").convert_alpha(), 
+                pygame.image.load("sprites/enemy_2.png").convert_alpha(), 
+                pygame.image.load("sprites/enemy_3.png").convert_alpha()]
+
+enemyHitboxDimensions = [pygame.Rect(1000, 606, 64, 80), pygame.Rect(2000, 606, 64, 80), pygame.Rect(3000, 606, 120, 80)]
+
 clouds = pygame.image.load("sprites/clouds.png").convert_alpha()
 
 # --Sounds--#
@@ -96,15 +100,15 @@ class player(object):
                     self.jumpCooldown = False
 
     def enemyCollosion(self):
-        if self.player.colliderect(enviroment.enemyhitbox1):
+        if self.player.colliderect(enemy1.hitbox):
             menu.startMenu = True
             player.dead = True
             counter.respawn()
-        elif self.player.colliderect(enviroment.enemyhitbox2):
+        elif self.player.colliderect(enemy2.hitbox):
             menu.startMenu = True
             player.dead = True
             counter.respawn()
-        elif self.player.colliderect(enviroment.enemyhitbox3):
+        elif self.player.colliderect(enemy3.hitbox):
             menu.startMenu = True
             player.dead = True
             counter.respawn()
@@ -122,7 +126,7 @@ class player(object):
             if not self.jump:
                 screen.blit(runSprites[counter.screenCount], (self.player.x, self.player.y))
 
-    def audioDriver(self):
+    def audio(self):
         if self.jump:
             self.barrier += 1
             if self.barrier == 1:
@@ -142,9 +146,6 @@ class enviroment(object):
         self.groundhitbox2 = pygame.Rect(1200, 666, 1200, 64)
         self.cloudshitbox1 = pygame.Rect(0, middle_canvas_y - 150, 1200, 64)
         self.cloudshitbox2 = pygame.Rect(1200, middle_canvas_y - 150, 1200, 64)
-        self.enemyhitbox1 = pygame.Rect(1000, 606, 64, 80)
-        self.enemyhitbox2 = pygame.Rect(2000, 606, 64, 80)
-        self.enemyhitbox3 = pygame.Rect(3000, 606, 120, 80)
 
     def renderEnviroment(self):
         pygame.draw.rect(screen, white, self.groundhitbox1)
@@ -176,40 +177,33 @@ class enviroment(object):
         if self.cloudshitbox2.right < 0:
             self.cloudshitbox2.left = 1200
 
-    def renderEnemies(self):
-        pygame.draw.rect(screen, white, self.enemyhitbox1)
-        pygame.draw.rect(screen, white, self.enemyhitbox2)
-        pygame.draw.rect(screen, white, self.enemyhitbox3)
-
-        screen.blit(enemy_1, (self.enemyhitbox1.x, self.enemyhitbox1.y))
-        screen.blit(enemy_2, (self.enemyhitbox2.x, self.enemyhitbox2.y))
-        screen.blit(enemy_3, (self.enemyhitbox3.x, self.enemyhitbox3.y))
-
-        if self.enemyhitbox1.right < 0:
-            self.enemyhitbox1.x = uniform(3000, 4500)
-        if self.enemyhitbox2.right < 0:
-            self.enemyhitbox2.x = uniform(4500, 8000)
-        if self.enemyhitbox3.right < 0:
-            self.enemyhitbox3.x = uniform(9000, 10000)
-
-        if not menu.startMenu:
-            self.enemyhitbox1.x -= self.speed
-            self.enemyhitbox2.x -= self.speed
-            self.enemyhitbox3.x -= self.speed
-
     def speedIncreaser(self):
         self.speed += 0.001
         if counter.score == 0:
             self.speed = 15
 
     def relocateEnemies(self):
-        self.enemyhitbox1.x = 1000
-        self.enemyhitbox2.x = 2000
-        self.enemyhitbox3.x = 3000
+        enemy1.hitbox.x = 1000
+        enemy2.hitbox.x = 2000
+        enemy3.hitbox.x = 3000
         counter.respawnCount = 0
         counter.respawnCooldown = True
         player.barrier = 0
         player.dead = False
+
+class enemy(object):
+    def __init__(self):
+        self.randomNumber = randrange(3)
+        self.hitbox = (enemyHitboxDimensions[self.randomNumber])
+
+    def renderEnemy(self):
+        pygame.draw.rect(screen, white, self.hitbox)
+        screen.blit(enemySprites[self.randomNumber], (self.hitbox.x, self.hitbox.y))
+    
+        if self.hitbox.right < 0:
+            self.hitbox.x = uniform(3000, 7000)
+        if not menu.startMenu:
+            self.hitbox.x -= enviroment.speed
 
 class counter(object):
     def __init__(self):
@@ -261,7 +255,6 @@ class menu(object):
         self.gameFont2 = pygame.font.Font("fonts/Unibody8Pro-Regular.otf", 16)
 
     def menuHandeler(self):
-        
         screen.blit(titlescreen, (middle_canvas_x, middle_canvas_y - 300))
         screen.blit(startanimation[counter.screenCount], (middle_canvas_x - 290, middle_canvas_y - 300))
         
@@ -323,8 +316,12 @@ def renderGraphics():
     player.renderPlayer()
     enviroment.renderEnviroment()
     enviroment.speedIncreaser()
-    player.audioDriver()
-    enviroment.renderEnemies()
+    player.audio()
+
+    enemy1.renderEnemy()
+    enemy2.renderEnemy()
+    enemy3.renderEnemy()
+
     player.skinController()
     player.enemyCollosion()
     counter.count()
@@ -336,6 +333,10 @@ menu = menu()
 enviroment = enviroment()
 counter = counter()
 load = load()
+
+enemy1 = enemy()
+enemy2 = enemy()
+enemy3 = enemy()
 
 def actone():
     splashScreen()
