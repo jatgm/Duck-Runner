@@ -183,9 +183,9 @@ class enviroment(object):
             self.speed = 15
 
     def relocateEnemies(self):
-        enemy1.hitbox.x = 1000
-        enemy2.hitbox.x = 2000
-        enemy3.hitbox.x = 3000
+        enemy1.hitbox.x = uniform(1000, 2000)
+        enemy2.hitbox.x = uniform(2000, 3000)
+        enemy3.hitbox.x = uniform(3000, 4000)
         counter.respawnCount = 0
         counter.respawnCooldown = True
         player.barrier = 0
