@@ -49,7 +49,6 @@ JaxDeath = [
 
 eYeehaw = pygame.mixer.Sound("audio/Jax/jax_yeehaw.wav")
 
-
 # Icons #
 
 iconHover = pygame.image.load("icons/icons0.png").convert_alpha()
@@ -117,6 +116,8 @@ class player(object):
             screen.blit(idleSprite, (self.player.x, self.player.y))
         if self.jump:
             screen.blit(idleSprite, (self.player.x, self.player.y))
+        if self.dead:
+            screen.blit(deadduck, (self.player.x, self.player.y))
         if not menu.startMenu:
             if not self.jump:
                 screen.blit(runSprites[counter.screenCount], (self.player.x, self.player.y))
@@ -126,10 +127,12 @@ class player(object):
             self.barrier += 1
             if self.barrier == 1:
                 jump.play()
+                print('poop')
         if self.dead:
             self.barrier += 1
             if self.barrier == 1:
                 JaxDeath[randrange(4)].play()
+                print('pee')
 
 class enviroment(object):
     def __init__(self):
@@ -258,52 +261,50 @@ class menu(object):
         self.gameFont2 = pygame.font.Font("fonts/Unibody8Pro-Regular.otf", 16)
 
     def menuHandeler(self):
-        if menu.startMenu:
-            screen.blit(titlescreen, (middle_canvas_x, middle_canvas_y - 300))
-            screen.blit(startanimation[counter.screenCount], (middle_canvas_x - 290, middle_canvas_y - 300))
-            
-            mx, my = pygame.mouse.get_pos()
+        
+        screen.blit(titlescreen, (middle_canvas_x, middle_canvas_y - 300))
+        screen.blit(startanimation[counter.screenCount], (middle_canvas_x - 290, middle_canvas_y - 300))
+        
+        mx, my = pygame.mouse.get_pos()
 
-            iconHitbox2 = pygame.Rect(393 + 64, 355, 128, 128)
-            iconHitbox1 = pygame.Rect(393 + 64 - 128, 355, 128, 128)
-            iconHitbox3 = pygame.Rect(393 + 64 + 128, 355, 128, 128)
+        iconHitbox2 = pygame.Rect(393 + 64, 355, 128, 128)
+        iconHitbox1 = pygame.Rect(393 + 64 - 128, 355, 128, 128)
+        iconHitbox3 = pygame.Rect(393 + 64 + 128, 355, 128, 128)
 
-            pygame.draw.rect(screen, white, iconHitbox1)
-            pygame.draw.rect(screen, white, iconHitbox2)
-            pygame.draw.rect(screen, white, iconHitbox3)
+        pygame.draw.rect(screen, white, iconHitbox1)
+        pygame.draw.rect(screen, white, iconHitbox2)
+        pygame.draw.rect(screen, white, iconHitbox3)
 
-            if iconHitbox1.collidepoint((mx, my)):
-                screen.blit(iconHover, (iconHitbox1.x + 8, iconHitbox1.y + 8))
-                if menu.click:
-                    menu.click = False
+        if iconHitbox1.collidepoint((mx, my)):
+            screen.blit(iconHover, (iconHitbox1.x + 8, iconHitbox1.y + 8))
+            if self.click:
+                self.click = False
+        elif iconHitbox2.collidepoint((mx, my)):
+            screen.blit(iconHover, (iconHitbox2.x + 8, iconHitbox2.y + 8))
+            if self.click:
+                print("bruh")
+                self.startMenu = False
+                enviroment.relocateEnemies()
+                self.click = False
+        elif iconHitbox3.collidepoint((mx, my)):
+            screen.blit(iconHover, (iconHitbox3.x + 8, iconHitbox3.y + 8))
+            if menu.click:
+                print("Clicked Shop")
+                self.click = False
+        elif menu.upArrow:
+            if not counter.respawnCooldown:
+                self.startMenu = False
+                enviroment.relocateEnemies()
+                self.upArrow = False
+        else:
+            self.click = False
+        
+        versionText = menu.gameFont2.render("Beta 0.0", True, darker_light_grey)
+        screen.blit(versionText, (middle_canvas_x + 415, middle_canvas_y + 370))
 
-            if iconHitbox2.collidepoint((mx, my)):
-                screen.blit(iconHover, (iconHitbox2.x + 8, iconHitbox2.y + 8))
-                if menu.click:
-                    menu.startMenu = False
-                    enviroment.relocateEnemies()
-                    menu.click = False
-
-            if iconHitbox3.collidepoint((mx, my)):
-                screen.blit(iconHover, (iconHitbox3.x + 8, iconHitbox3.y + 8))
-                if menu.click:
-                    print("Clicked Shop")
-                    menu.click = False
-
-            if menu.upArrow:
-                if not counter.respawnCooldown:
-                    menu.startMenu = False
-                    enviroment.relocateEnemies()
-                    menu.upArrow = False
-                else:
-                    menu.upArrow = False
-
-            versionText = menu.gameFont2.render("Beta 0.0", True, darker_light_grey)
-            screen.blit(versionText, (middle_canvas_x + 415, middle_canvas_y + 370))
-
-            screen.blit(iconStart, (393 + 64, 355))
-            screen.blit(iconCredits, (393 + 64 - 128, 355))
-            screen.blit(iconShop, (393 + 64 + 128, 355))
+        screen.blit(iconStart, (393 + 64, 355))
+        screen.blit(iconCredits, (393 + 64 - 128, 355))
+        screen.blit(iconShop, (393 + 64 + 128, 355))
 
 def splashScreen():
     fade = pygame.Surface((screen_width, screen_height))
@@ -357,7 +358,9 @@ def actone():
                 menu.click = True
 
         renderGraphics()
-        menu.menuHandeler()
+
+        if menu.startMenu:
+            menu.menuHandeler()
 
         clock.tick(60)
         pygame.display.flip()
