@@ -36,7 +36,9 @@ enemySprites = [pygame.image.load("sprites/enemy_1.png").convert_alpha(),
                 pygame.image.load("sprites/enemy_2.png").convert_alpha(), 
                 pygame.image.load("sprites/enemy_3.png").convert_alpha()]
 
-enemyHitboxDimensions = [pygame.Rect(1000, 606, 64, 80), pygame.Rect(2000, 606, 64, 80), pygame.Rect(3000, 606, 120, 80)]
+enemyHitboxDimensions = [pygame.Rect(1000, 606, 64, 80), 
+                        pygame.Rect(2000, 606, 64, 80), 
+                        pygame.Rect(3000, 606, 120, 80)]
 
 clouds = pygame.image.load("sprites/clouds.png").convert_alpha()
 
@@ -291,7 +293,7 @@ class menu(object):
                 self.upArrow = False
         else:
             self.click = False
-        
+
         versionText = menu.gameFont2.render("Beta 0.0", True, darker_light_grey)
         screen.blit(versionText, (middle_canvas_x + 415, middle_canvas_y + 370))
 
@@ -304,8 +306,8 @@ def splashScreen():
     fade.fill((0, 0, 0))
     opacity = 255
 
-    for i in range(0, 255):
-        opacity -= 20
+    for _ in range(0, 255):
+        opacity -= 1
         fade.set_alpha(opacity)
         renderGraphics()
         screen.blit(fade, (0, 0))
